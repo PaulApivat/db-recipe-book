@@ -34,6 +34,28 @@ server.get('/recipe', (req, res) => {
     })
 });
 
+server.get('/ingredients', (req, res) => {
+    db('ingredients')
+    .then(rows => {
+        res.json(rows)
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: "Failed to retrieve all ingredients"})
+    })
+});
+
+server.get('/recipeingredients', (req, res) => {
+    db('recipeingredients')
+    .then(rows => {
+        res.json(rows)
+    })
+    .catch(err => {
+        console.log(err)
+        res.status(500).json({err: "Failed to retrieve join table"})
+    })
+})
+
 // getDish(id): should return the dish with the provided id and 
 // include a list of the related recipes.
 server.get('/dish/:id/recipe', (req, res) => {
@@ -44,6 +66,30 @@ server.get('/dish/:id/recipe', (req, res) => {
     })
     .catch(err => {
         res.status(500).json({err: "Failed to find recipe for this particular dish"})
+    })
+})
+
+// SHOPPING LIST: should return a list of all Recipe & Ingredients (+ quantity) for Dish with particular id
+server.get('/recipeingredients/:id/dish', (req, res) => {
+    const {id} = req.params;
+    db('recipeingredients').where('dish_id', id)
+    .then(rows => {
+        res.json(rows)
+    })
+    .catch(err => {
+        res.status(500).json({err: "Failed to find DISHES for this particular id"})
+    })
+})
+
+// (CORRECT) SHOPPING LIST: returns a lit of all ingredients for a particular Recipe
+server.get('/recipeingredients/:id/recipe', (req, res) => {
+    const {id} = req.params;
+    db('recipeingredients').where('recipe_id', id)
+    .then(rows => {
+        res.json(rows)
+    })
+    .catch(err => {
+        res.status(500).json({err: "Failed to find Recipe with this id and all associated ingredients"})
     })
 })
 
